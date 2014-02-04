@@ -1,4 +1,4 @@
-class ZendeskApi::Search < ZendeskApi::Resource
+class ZendeskApi::SearchResource < ZendeskApi::Resource
   def resource_name
     "search"
   end
@@ -7,4 +7,3 @@ class ZendeskApi::Search < ZendeskApi::Resource
     resource_name
   end
 end
-
