@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = ZendeskApi::VERSION
   spec.authors       = ["Rafael Bandeira"]
   spec.email         = ["rafaelbandeira3@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Zendesk Api client}
+  spec.summary       = %q{Work with Zendesk api resources}
   spec.homepage      = ""
   spec.license       = "MIT"
 
