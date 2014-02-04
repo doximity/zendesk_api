@@ -1,3 +1,6 @@
+require "net/http"
+require "json"
+
 class ZendeskApi::Resource
   ValidationError = Class.new(StandardError)
 
@@ -25,15 +28,6 @@ class ZendeskApi::Resource
     request(:get, params)[resource_collection_name]
   end
 
-  protected
-  def resource_name
-    raise NotImplementedError
-  end
-
-  def resource_collection_name
-    resource_name.pluralize
-  end
-
   def request(method, *args)
     data = args.extract_options! || {}
 
@@ -43,11 +37,15 @@ class ZendeskApi::Resource
     end
 
     uri = "/api/v2/#{url_part}.json"
-    uri += "?#{data.to_param}" if method == :get
+    # TODO: find a replacemente for Rails' `.to_param`
+    data_to_param = data.reduce("") { |m, kv| m << "#{kv[0]}=#{kv[1]}&" }
+    uri += "?#{data_to_param}" if method == :get
 
-    req_class = "Net::HTTP::#{method.to_s.capitalize}".constantize
+    # TODO: find a replacement for Rails' `.constantize`
+    req_class = "Net::HTTP::#{method.to_s.capitalize}".
+      split("::").reduce(Object) { |m, c| m.const_get(c) }
     req = req_class.new(uri)       
-    req.body = data.present? && method != :get ? data.to_json : nil
+    req.body = !data.nil? && method != :get ? data.to_json : nil
 
     if method == :post
       @api.logger.debug("POST to ZendeskAPI #{uri} : \n#{req.body}\n\n")
@@ -56,6 +54,16 @@ class ZendeskApi::Resource
     req["Content-Type"] = "application/json"
     
     processed_response(@api.auth_request(req))
+  end
+
+  protected
+  def resource_name
+    raise NotImplementedError
+  end
+
+  def resource_collection_name
+    # TODO: find a replacement for Rails' `pluralize`
+    resource_name + "s"
   end
 
   private

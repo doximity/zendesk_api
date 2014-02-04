@@ -1,4 +1,8 @@
+require "zendesk_api/client_dsl"
+
 class ZendeskApi::Client
+  include ZendeskApi::ClientDsl
+
   class Config
     attr_accessor :token, :username, :host, :logger
   end
@@ -9,10 +13,6 @@ class ZendeskApi::Client
 
   def initialize(config)
     @config = config
-  end
-
-  def ping
-    Resource.new(self).request("users/me", :get)
   end
 
   def auth_request(req)
