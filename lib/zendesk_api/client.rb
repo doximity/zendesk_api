@@ -4,7 +4,7 @@ class ZendeskApi::Client
   end
 
   def self.build(&block)
-    new(block.call(Config.new))
+    new(Config.new.tap(&block))
   end
 
   def initialize(config)
