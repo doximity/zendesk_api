@@ -1,5 +1,6 @@
 require "net/http"
 require "json"
+require "uri"
 
 class ZendeskApi::Resource
   ValidationError = Class.new(StandardError)
@@ -9,11 +10,11 @@ class ZendeskApi::Resource
   end
 
   def create(params)
-    request(:post, resource_name => params)[resource_name]
+    request(:post, resource_name => params)[root_element]
   end
 
   def update(id, params)
-    request(:put, id, resource_name => params)[resource_name]
+    request(:put, id, resource_name => params)[root_element]
   end
 
   def delete(id)
@@ -21,35 +22,46 @@ class ZendeskApi::Resource
   end
 
   def show(id)
-    request(:get, id)[resource_name]
+    request(:get, id)[root_element]
   end
 
   def list(params = {})
-    request(:get, params)[resource_collection_name]
+    request(:get, params)[collection_root_element]
   end
 
   def request(method, *args)
     data = args.extract_options! || {}
+    path = args.first || ""
+    uri = build_url(path, method == :get ? data : {})
+    build_request(method, uri, data)
+  end
 
-    url_part = resource_collection_name
-    if id = args.first
-      url_part += "/#{id}"
+  def build_url(path, data = {})
+    path = "/#{path}" if path != ""
+    resource_path = resource_collection_name
+
+    uri = "/api/v2/#{resource_path}#{path}.json"
+
+    unless data.empty?
+      # TODO: find a replacemente for Rails' `.to_param`
+      data_to_param = data.
+        reduce("") { |m, kv| m << "#{kv[0]}=#{URI.encode(kv[1].to_s)}&" }
+      uri += "?#{data_to_param}"
     end
 
-    uri = "/api/v2/#{url_part}.json"
-    # TODO: find a replacemente for Rails' `.to_param`
-    data_to_param = data.reduce("") { |m, kv| m << "#{kv[0]}=#{kv[1]}&" }
-    uri += "?#{data_to_param}" if method == :get
+    uri
+  end
 
+  def build_request(method, uri, data = nil)
     # TODO: find a replacement for Rails' `.constantize`
     req_class = "Net::HTTP::#{method.to_s.capitalize}".
       split("::").reduce(Object) { |m, c| m.const_get(c) }
     req = req_class.new(uri)       
     req.body = !data.nil? && method != :get ? data.to_json : nil
 
-    if method == :post
-      @api.logger.debug("POST to ZendeskAPI #{uri} : \n#{req.body}\n\n")
-    end
+    @api.logger.debug(
+      "#{method.to_s.upcase} to ZendeskAPI #{uri}" + 
+      ([:post, :put].include?(method) ? " : \n#{req.body}\n\n" : ""))
 
     req["Content-Type"] = "application/json"
     
@@ -64,6 +76,14 @@ class ZendeskApi::Resource
   def resource_collection_name
     # TODO: find a replacement for Rails' `pluralize`
     resource_name + "s"
+  end
+
+  def root_element
+    resource_name
+  end
+
+  def collection_root_element
+    resource_collection_name
   end
 
   private

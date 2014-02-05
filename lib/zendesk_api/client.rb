@@ -20,6 +20,10 @@ class ZendeskApi::Client
     http_client.request(req)
   end
 
+  def logger
+    @config.logger
+  end
+
   protected
   def token
     @config.token
@@ -31,10 +35,6 @@ class ZendeskApi::Client
 
   def host
     @config.host
-  end
-
-  def logger
-    @config.logger
   end
 
   def http_client
