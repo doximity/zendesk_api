@@ -18,15 +18,23 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
     end
 
     def next_page
-      @hash["next_page"] # TODO: support navigation
+      navigate(@hash["next_page"])
     end
 
     def previous_page
-      @hash["previous_page"] # TODO: support navigation
+      navigate(@hash["previous_page"])
     end
 
     def count
       @hash["count"]
+    end
+
+    private
+    def navigate(url)
+      uri = URI.parse(url)
+      self.class.new(
+        resource,
+        resource.build_request(:get, uri.path + "?" + uri.query))
     end
   end
 
