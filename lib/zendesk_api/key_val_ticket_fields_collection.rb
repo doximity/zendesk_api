@@ -13,6 +13,10 @@ class ZendeskApi::KeyValTicketFieldsCollection
   def [](title)
     @hash[title]
   end
+  
+  def merge(hash)
+    @hash.merge!(hash)
+  end
 
   def unexisting_fields
     existing_titles = @repo.map {|h| h["title"].to_sym }

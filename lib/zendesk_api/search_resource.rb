@@ -14,7 +14,9 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
     end
     
     def tickets
-      @resource.tickets.show_many(result_ids)
+      return @tickets if defined?(@tickets)
+
+      @tickets = @resource.tickets.show_many(result_ids)
     end
 
     def next_page
