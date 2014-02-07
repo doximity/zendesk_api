@@ -88,16 +88,16 @@ class ZendeskApi::Resource
 
   private
   def processed_response(resp)
-    case resp
-    when Net::HTTPCreated, Net::HTTPOK
+    case resp.code
+    when "200", "201"
       begin
         JSON.parse(resp.body)
       rescue JSON::ParserError
         true
       end
-    when Net::HTTPUnprocessableEntity
+    when "422"
       raise ValidationError, resp.body
-    when Net::HTTPUnauthorized
+    when "403"
       raise "Invalid credentials for ZendeskApi"
     else
       @api.logger.debug(resp)
