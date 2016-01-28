@@ -15,4 +15,8 @@ module ZendeskApi::ClientDsl
   def ticket_fields
     ZendeskApi::TicketFieldsResource.new(self)
   end
+
+  def uploads
+    ZendeskApi::UploadsResource.new(self)
+  end
 end
