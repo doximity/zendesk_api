@@ -12,7 +12,7 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
     def result_ids
       results.map { |h| h["id"] }
     end
-    
+
     def tickets
       return @tickets if defined?(@tickets)
 
@@ -34,9 +34,10 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
     private
     def navigate(url)
       uri = URI.parse(url)
+
       self.class.new(
-        resource,
-        resource.build_request(:get, uri.path + "?" + uri.query))
+        @resource,
+        @resource.build_request(:get, uri.path + "?" + uri.query))
     end
   end
 
