@@ -1,4 +1,6 @@
 class ZendeskApi::SearchResource < ZendeskApi::Resource
+  PaginationError = Class.new(ZendeskApi::Error)
+
   class SearchResults
     def initialize(resource, hash)
       @resource = resource
@@ -20,11 +22,23 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
     end
 
     def next_page
+      raise PaginationError, "next page not found" unless next_page?
+
       navigate(@hash["next_page"])
     end
 
     def previous_page
+      raise PaginationError, "previous page not found" unless previous_page?
+
       navigate(@hash["previous_page"])
+    end
+
+    def next_page?
+      @hash["next_page"].present?
+    end
+
+    def previous_page?
+      @hash["previous_page"].present?
     end
 
     def count
