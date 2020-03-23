@@ -1,4 +1,6 @@
 class ZendeskApi::SearchResource < ZendeskApi::Resource
+  MAX_RESULTS = 1_000
+
   PaginationError = Class.new(ZendeskApi::Error)
 
   class SearchResults
@@ -34,7 +36,15 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
     end
 
     def next_page?
-      @hash["next_page"].present?
+      next_page_url = @hash["next_page"]
+
+      return false if next_page_url.blank?
+
+      query_params = CGI.parse(URI.parse(next_page_url).query)
+      next_page = query_params["page"].first.to_i
+      per_page = query_params["per_page"]&.first&.to_i || 100
+
+      next_page * per_page <= MAX_RESULTS
     end
 
     def previous_page?
@@ -64,7 +74,7 @@ class ZendeskApi::SearchResource < ZendeskApi::Resource
   end
 
   def resource_name
-    "search/incremental"
+    "search"
   end
 
   def collection_root_element
