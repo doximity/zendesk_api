@@ -22,4 +22,8 @@ describe ZendeskApi::Client do
   it "responds to uploads" do
     client.uploads.must_be_kind_of ZendeskApi::UploadsResource
   end
+
+  it "responds to users" do
+    client.users.must_be_kind_of ZendeskApi::UsersResource
+  end
 end
