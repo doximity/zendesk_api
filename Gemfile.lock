@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    zendesk_api (0.0.14)
+    zendesk_api (0.0.15)
 
 GEM
   remote: https://rubygems.org/
