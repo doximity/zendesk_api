@@ -19,4 +19,8 @@ module ZendeskApi::ClientDsl
   def uploads
     ZendeskApi::UploadsResource.new(self)
   end
+
+  def users
+    ZendeskApi::UsersResource.new(self)
+  end
 end
