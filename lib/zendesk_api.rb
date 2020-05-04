@@ -5,6 +5,7 @@ require "zendesk_api/tickets_resource"
 require "zendesk_api/ticket_fields_resource"
 require "zendesk_api/search_resource"
 require "zendesk_api/uploads_resource"
+require "zendesk_api/users_resource"
 require "zendesk_api/client"
 
 module ZendeskApi
